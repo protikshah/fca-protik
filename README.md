@@ -9,9 +9,9 @@
 [![npm](https://img.shields.io/badge/npm-fca--protik-CB3837?style=for-the-badge&logo=npm)](https://www.npmjs.com/package/fca-protik)
 [![Node](https://img.shields.io/badge/Node.js-%3E%3D18-339933?style=for-the-badge&logo=node.js)](https://nodejs.org)
 [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
-[![Author](https://img.shields.io/badge/Author-protik-7c3aed?style=for-the-badge&logo=github)](https://github.com/protik)
+[![Author](https://img.shields.io/badge/Author-protik-7c3aed?style=for-the-badge&logo=github)](https://github.com/protikshah)
 
-**Created & maintained by [protik](https://github.com/protik)**
+**Created & maintained by [protik](https://github.com/protikshah)**
 
 </div>
 
@@ -30,7 +30,7 @@
 | 🚫 **E2EE / Secret Chat** | ❌ **Removed** | Removed for stability & lower load |
 
 > **Note:** This build intentionally **does not include E2EE** (Secret Conversations).  
-> Normal Messenger chats & groups work fully. Connection is more stable and lighter on resources.
+> Normal Messenger chats & groups work fully. Connection is more stable and lighter.
 
 ---
 
@@ -38,13 +38,11 @@
 
 ```bash
 npm install fca-protik
+# or from GitHub:
+# npm install github:protikshah/fca-protik
 ```
 
 **Requirements:** Node.js `>= 18.0.0`
-
-```bash
-node -v
-```
 
 ---
 
@@ -63,12 +61,8 @@ login(
       return;
     }
 
-    console.log("╭─────────────────────────────╮");
-    console.log("│   🚀 FCA-PROTIK CONNECTED   │");
-    console.log("│      by protik ⚡           │");
-    console.log("╰─────────────────────────────╯");
+    console.log("🚀 FCA-PROTIK CONNECTED — by protik");
 
-    // Auto-save session every 3 minutes
     if (api.autoSaveSession) {
       api.autoSaveSession("./account.json", {
         interval: 3 * 60 * 1000,
@@ -77,13 +71,9 @@ login(
     }
 
     api.listenMqtt((err, event) => {
-      if (err) {
-        console.error("Listen error:", err);
-        return;
-      }
-
+      if (err) return console.error(err);
       if (event.type === "message" && event.body) {
-        api.sendMessage("🤖 Received: " + event.body, event.threadID);
+        api.sendMessage("🤖 " + event.body, event.threadID);
       }
     });
   }
@@ -92,92 +82,20 @@ login(
 
 ---
 
-## 🔐 Session Protection
-
-```javascript
-api.autoSaveSession("./account.json");
-
-api.autoSaveSession("./account.json", {
-  interval: 5 * 60 * 1000,
-  debounce: 30 * 1000,
-  backup: true,
-  maxBackups: 5
-});
-
-api.saveSession();
-api.restoreFromBackup();
-api.stopAutoSave();
-```
-
----
-
-## 💬 Messaging Examples
-
-```javascript
-// Simple text
-api.sendMessage("Hello from protik!", threadID);
-
-// Reply
-api.sendMessage({ body: "Reply text", replyTo: messageID }, threadID);
-
-// Reaction
-api.setMessageReaction("❤️", messageID, threadID);
-
-// Typing indicator
-api.sendTypingIndicator(threadID);
-```
-
----
-
-## 👥 Group Helpers
-
-```javascript
-api.addUserToGroup(userID, threadID);
-api.removeUserFromGroup(userID, threadID);
-api.changeAdminStatus(threadID, userID, true);
-api.changeNickname("New Nick", threadID, userID);
-api.setTitle("Group Name", threadID);
-api.createPoll("Question?", ["A", "B"], threadID);
-```
-
----
-
-## ⚙️ Login Options
-
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `listenEvents` | boolean | `false` | Listen to events |
-| `selfListen` | boolean | `false` | Receive own messages |
-| `autoMarkRead` | boolean | `false` | Mark as read |
-| `autoReconnect` | boolean | `true` | Reconnect on drop |
-| `online` | boolean | `true` | Show online |
-| `userAgent` | string | browser UA | Custom User-Agent |
-| `proxy` | string | — | HTTP/HTTPS proxy |
-
----
-
 ## 🚫 Why E2EE was removed?
 
-E2EE (Secret Conversations) adds:
-- Extra Noise WebSocket connection
-- Signal Protocol crypto + device registration
-- Frequent CAT token / ICDC failures
-- Higher CPU & reconnect spam
-
-Most bots only need **normal chats & groups**.  
-Removing E2EE makes the library **lighter, faster, and more stable**.
-
-If you need Secret Chat support, use a different FCA build that still includes E2EE.
+E2EE adds Noise WebSocket, Signal crypto, CAT/ICDC tokens and frequent reconnect errors.  
+Most bots only need normal chats & groups — this build is lighter and more stable.
 
 ---
 
-## 📋 Changelog (this build)
+## 📋 Changelog
 
 - **v6.7.4** (by protik)
-  - ❌ Completely removed E2EE / Secret Conversation stack
-  - 🧹 Removed `@signalapp/libsignal-client` dependency
-  - 🛡️ Kept session protection, MQTT listen, messaging & group APIs
-  - 📝 README redesigned under **protik** branding
+  - Full complete package (utils, listenMqtt, messaging, etc.)
+  - E2EE / Secret Conversation stack removed
+  - `@signalapp/libsignal-client` dependency removed
+  - README under **protik** branding
 
 ---
 
@@ -186,22 +104,14 @@ If you need Secret Chat support, use a different FCA build that still includes E
 | Role | Name |
 |------|------|
 | **Author / Maintainer** | **protik** |
-| Base lineage | fca-nx / DongDev community |
-
----
+| Base | fca-nx |
 
 ## 📄 License
 
-MIT License — free to use, modify, and distribute.
-
----
+MIT
 
 <div align="center">
 
-**Built with ⚡ by [protik](https://github.com/protik)**
-
-⭐ Star the repo if FCA-PROTIK helps your bot!
-
-<img src="https://capsule-render.vercel.app/api?type=waving&color=0:ec4899,50:7c3aed,100:0f172a&height=120&section=footer" width="100%"/>
+**Built with ⚡ by [protik](https://github.com/protikshah)**
 
 </div>

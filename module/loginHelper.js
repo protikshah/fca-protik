@@ -1340,8 +1340,7 @@ function loginHelper(appState, Cookie, email, password, globalOptions, callback)
             });
           }, 86400000);
         }
-        // E2EE completely removed by protik — lighter & more stable for normal Messenger bots
-        // Secret Conversation / E2EE support is disabled in this build.
+        // E2EE completely removed by protik — lighter & more stable
         logger("E2EE disabled in this build (removed for stability)");
 
 
@@ -1368,13 +1367,14 @@ function loginHelper(appState, Cookie, email, password, globalOptions, callback)
           logger(`sendMessage fca-nx override failed (non-fatal): ${e && e.message ? e.message : String(e)}`, "warn");
         }
 
-        // listenMqtt override (plain MQTT only — E2EE removed)
+        // listenMqtt override with fca-nx version (better MQTT stability)
         try {
           const stableListenMqtt = require("../src/api/socket/listenMqtt")(defaultFuncs, api, ctxMain);
+          // Plain MQTT only (E2EE removed by protik)
           api._listenMqttRaw = stableListenMqtt;
           api.listenMqtt = api.listen = stableListenMqtt;
         } catch (e) {
-          logger(`listenMqtt override failed (non-fatal): ${e && e.message ? e.message : String(e)}`, "warn");
+          logger(`listenMqtt fca-nx override failed (non-fatal): ${e && e.message ? e.message : String(e)}`, "warn");
         }
 
         try {
