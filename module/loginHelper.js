@@ -1340,52 +1340,10 @@ function loginHelper(appState, Cookie, email, password, globalOptions, callback)
             });
           }, 86400000);
         }
-        // ✅ fca-nx core features register
-        try {
-          const e2eeModule = require("../src/api/socket/e2ee");
-          api.e2ee = new e2eeModule.E2EEBridge(ctxMain, api, defaultFuncs);
-          ctxMain.e2ee = api.e2ee;
-          api.connectE2EE = (deviceStorePath) => api.e2ee.connect(deviceStorePath, ctxMain.userID);
-          api.listenE2EE = require("../src/api/socket/listenE2EE")(defaultFuncs, api, ctxMain);
+        // E2EE completely removed by protik — lighter & more stable for normal Messenger bots
+        // Secret Conversation / E2EE support is disabled in this build.
+        logger("E2EE disabled in this build (removed for stability)");
 
-          // Auto-connect E2EE and make it the default listener so existing
-          // bots calling api.listen() OR api.listenMqtt() directly also
-          // receive E2EE (Secret Conversation) messages without any extra
-          // setup or changes on the bot side.
-          //
-          // [Fixed by xalman] IMPORTANT: assign api.listen/api.listenMqtt to the combined
-          // listener SYNCHRONOUSLY, before connectE2EE() resolves. Bots
-          // commonly call api.listenMqtt(callback) immediately in the login
-          // callback - if we waited for the async connectE2EE() promise to
-          // swap these over, that call would already have captured the old
-          // plain-MQTT-only function, permanently missing E2EE (inbox)
-          // messages even after E2EE finished connecting moments later.
-          api.listen = api.listenE2EE;
-          api.listenMqtt = api.listenE2EE;
-
-          // [Fixed by xalman] Retry E2EE auto-connect with backoff instead of
-          // giving up forever after one failed attempt - a transient network
-          // blip or momentary FB rate-limit on device registration used to
-          // leave the bot stuck in group-only mode until a full restart.
-          const connectE2EEWithRetry = async (attempt = 0) => {
-            try {
-              await api.connectE2EE();
-              logger("E2EE auto-connected and merged into api.listen()/api.listenMqtt()");
-            } catch (e) {
-              const msg = e && e.message ? e.message : String(e);
-              if (attempt < 3) {
-                const delayMs = 5000 * Math.pow(3, attempt); // 5s, 15s, 45s
-                logger(`E2EE auto-connect failed (attempt ${attempt + 1}/4): ${msg} - retrying in ${Math.round(delayMs / 1000)}s`, "warn");
-                setTimeout(() => connectE2EEWithRetry(attempt + 1), delayMs);
-              } else {
-                logger(`E2EE auto-connect failed after 4 attempts (non-fatal, continuing without E2EE): ${msg}`, "warn");
-              }
-            }
-          };
-          connectE2EEWithRetry();
-        } catch (e) {
-          logger(`E2EE init failed (non-fatal): ${e && e.message ? e.message : String(e)}`, "warn");
-        }
 
         try {
           api.sessionGuard = require("../src/api/messaging/sessionGuard")(defaultFuncs, api, ctxMain);
@@ -1410,21 +1368,13 @@ function loginHelper(appState, Cookie, email, password, globalOptions, callback)
           logger(`sendMessage fca-nx override failed (non-fatal): ${e && e.message ? e.message : String(e)}`, "warn");
         }
 
-        // listenMqtt override with fca-nx version (better MQTT stability)
+        // listenMqtt override (plain MQTT only — E2EE removed)
         try {
           const stableListenMqtt = require("../src/api/socket/listenMqtt")(defaultFuncs, api, ctxMain);
-          // Keep the raw MQTT listener behind the combined listener. The
-          // E2EE bridge is installed above, but replacing api.listenMqtt here
-          // used to silently discard it, so only group messages arriving over
-          // plain MQTT reached bot handlers.
           api._listenMqttRaw = stableListenMqtt;
-          if (typeof api.listenE2EE === "function") {
-            api.listenMqtt = api.listen = api.listenE2EE;
-          } else {
-            api.listenMqtt = api.listen = stableListenMqtt;
-          }
+          api.listenMqtt = api.listen = stableListenMqtt;
         } catch (e) {
-          logger(`listenMqtt fca-nx override failed (non-fatal): ${e && e.message ? e.message : String(e)}`, "warn");
+          logger(`listenMqtt override failed (non-fatal): ${e && e.message ? e.message : String(e)}`, "warn");
         }
 
         try {

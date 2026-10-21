@@ -1,7 +1,7 @@
 {
   "name": "fca-protik",
-  "version": "6.7.3",
-  "description": "Facebook Messenger API for Node.js — Fast, Secure, and Feature-Rich",
+  "version": "6.7.4",
+  "description": "Facebook Messenger API for Node.js by protik \u2014 Fast, Stable, No E2EE bloat",
   "main": "index.js",
   "types": "index.d.ts",
   "exports": {
@@ -70,7 +70,6 @@
   "dependencies": {
     "@noble/curves": "^2.2.0",
     "@noble/hashes": "^2.2.0",
-    "@signalapp/libsignal-client": "0.70.0",
     "axios": "^1.13.5",
     "axios-cookiejar-support": "^5.0.5",
     "bluebird": "^3.7.2",
